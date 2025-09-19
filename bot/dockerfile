@@ -1,0 +1,21 @@
+# Базовый образ Python
+FROM python:3.11-slim
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Копируем зависимости
+COPY requirements.txt .
+
+# Устанавливаем зависимости
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Копируем код бота
+COPY telegram_bot.py .
+COPY .env .
+
+# Устанавливаем переменные окружения (можно и через docker run)
+ENV PYTHONUNBUFFERED=1
+
+# Команда запуска
+CMD ["python", "telegram_bot.py"]
