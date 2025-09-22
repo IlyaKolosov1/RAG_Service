@@ -33,7 +33,7 @@ jobs:
 
       - name: Deploy audit service
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 crdlts@10.129.0.15 "
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 crdlts@158.160.26.181"
             cd /home/user/bot-deploy;
             docker build -t audit-service ./audit;
             docker rm -f audit || true;
