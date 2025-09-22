@@ -1,0 +1,42 @@
+name: workflow_name
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy-bot:
+    runs-on: ubuntu-latest
+    env:
+      PRIVATE_KEY_SSH: ${{ secrets.PRIVATE_KEY_SSH }}
+      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+      S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+      S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+      SERVICE_ACCOUNT_ID: ${{ secrets.SERVICE_ACCOUNT_ID }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      FOLDER_ID: ${{ secrets.FOLDER_ID }}
+      KEY_ID: ${{ secrets.KEY_ID }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "$PRIVATE_KEY_SSH" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: Install Docker and SSH
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io ssh
+
+      - name: Deploy audit service
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 crdlts@10.129.0.15 "
+            cd /home/user/bot-deploy;
+            docker build -t audit-service ./audit;
+            docker rm -f audit || true;
+            docker network create bot-network || true;
+            docker run -d --name audit --network bot-network -p 8000:8000 audit-service
+          "
