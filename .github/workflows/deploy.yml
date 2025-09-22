@@ -18,11 +18,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Debug SSH key
-        run: |
-          echo "${{ secrets.PRIVATE_KEY_SSH }}" | head -n 2
+        uses: actions/checkout@v3      
 
       - name: Set up SSH
         run: |
@@ -43,7 +39,7 @@ jobs:
 
       - name: Deploy audit service
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 crdlts@158.160.26.181 "
+          echo "$PRIVATE_KEY_SSH" | tr -d '\r' | ssh -i /dev/stdin -o StrictHostKeyChecking=no crdlts@158.160.26.181 "
             cd /home/user/bot-deploy;
             docker build -t audit-service ./audit;
             docker rm -f audit || true;
